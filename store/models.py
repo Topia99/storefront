@@ -21,15 +21,15 @@ class Collection(models.Model):
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
-    slug = models.SlugField(default='-') 
-    description = models.TextField()
+    slug = models.SlugField() 
+    description = models.TextField(null=True, blank=True)
     unit_price = models.DecimalField(max_digits=6,decimal_places=2)
     inventory = models.IntegerField()
     last_update = models.DateTimeField(auto_now=True)
     # products - collection
     collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
     #promotion
-    promotions = models.ManyToManyField(Promotion, related_name='products')
+    promotions = models.ManyToManyField(Promotion, blank=True)
     # Change the admin object name to its title
     def __str__(self)  -> str:
         return self.title
