@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 # ignore storefront/__init__.py
-.storefront/__init__.py
+storefront/__init__.py
 
 # C extensions
 *.so
