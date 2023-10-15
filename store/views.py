@@ -3,9 +3,42 @@ from django.http import HttpResponse
 from django.db.models.aggregates import Count
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from  rest_framework import status
 from .models import Product, Collection
 from .serializers import ProductSerializer, CollectionSerializer
+
+class ProductList(APIView):
+    def get(self, request):
+        queryset = Product.objects.select_related('collection').all()
+        serializer = ProductSerializer(
+            queryset, many=True, context={'request': request})
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = ProductSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+class ProductDetail(APIView):
+    def get(self, request):
+        product = get_object_or_404(Product, pk=id)
+        serializer = ProductSerializer(product)
+        return Response(serializer.data)
+    def patch(self, request):
+        product = get_object_or_404(Product, pk=id)
+        serializer = ProductSerializer(product, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()   
+    def delete(self, request):
+        product = get_object_or_404(Product, pk=id)
+        if product.orderitems.count() > 0:
+            return Response(
+                {'error': 'Product cannot be deleted because it is associated with an order item.'}, 
+                status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        Product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 # Create your views here.
 @api_view(['GET', 'POST'])
